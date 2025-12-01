@@ -3,543 +3,457 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wochenbericht – Stundenzettel</title>
-
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#ffffff">
-
+  <title>Wochenbericht / Stundenzettel</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
-      padding: 1rem;
-      background: #f3f4f6;
+      padding: 0.5rem;
+      background:#f5f5f5;
     }
 
-    .container {
-      max-width: 950px;
+    .wrapper {
+      max-width: 700px;
       margin: 0 auto;
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 0.75rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background:#fff;
+      border-radius: 12px;
+      padding: 0.8rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
     h1 {
-      font-size: 1.4rem;
-      margin-bottom: 0.25rem;
+      font-size: 1.1rem;
+      margin: 0 0 0.5rem;
+      text-align:center;
     }
 
     .row {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
-      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
     }
 
-    .row label {
-      font-size: 0.9rem;
-      white-space: nowrap;
+    .field {
+      flex: 1 1 110px;
+      min-width: 100px;
+      display:flex;
+      flex-direction:column;
+      font-size: 0.8rem;
     }
 
-    .row input[type="text"],
-    .row input[type="date"],
-    .row input[type="time"],
-    .row input[type="number"] {
-      padding: 0.25rem 0.4rem;
-      border-radius: 0.35rem;
-      border: 1px solid #d1d5db;
-      font-size: 0.9rem;
+    .field label {
+      margin-bottom: 0.15rem;
     }
 
-    /* Tagesstunden-Felder kleiner */
-    input.hours {
-      width: 30px !important;
-      text-align: center;
-    }
-
-    /* Spesen-Felder kleiner */
-    input[id^="spesen-"] {
-      width: 20px !important;
-      text-align: right;
+    .field input {
+      padding: 0.25rem 0.35rem;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 0.75rem;
-      font-size: 0.9rem;
+      font-size: 0.75rem;
     }
 
     th, td {
-      border: 1px solid #d1d5db;
-      padding: 0.35rem 0.4rem;
-      text-align: left;
+      border: 1px solid #ddd;
+      padding: 0.25rem;
+      text-align: center;
     }
 
     th {
-      background: #e5e7eb;
+      background:#fafafa;
+      font-weight:600;
     }
 
-    tfoot td {
-      font-weight: 600;
-      background: #f9fafb;
+    tbody tr:nth-child(odd) {
+      background:#fcfcfc;
+    }
+
+    .totals {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      display:flex;
+      justify-content: space-between;
+      flex-wrap:wrap;
+      gap:0.5rem;
+    }
+
+    .totals div {
+      background:#fafafa;
+      padding:0.4rem 0.6rem;
+      border-radius:8px;
+      border:1px solid #e0e0e0;
+      flex:1 1 130px;
+    }
+
+    .signature-container {
+      margin-top:0.8rem;
+    }
+
+    #signature-pad {
+      width: 100%;
+      height: 120px;
+      border:1px solid #ccc;
+      border-radius:8px;
+      background:#fff;
+      touch-action:none;
     }
 
     .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 1rem;
+      margin-top: 0.6rem;
+      display:flex;
+      flex-wrap:wrap;
+      gap:0.5rem;
+      justify-content: space-between;
     }
 
     button {
-      border: none;
-      border-radius: 999px;
-      padding: 0.5rem 0.9rem;
-      font-size: 0.9rem;
-      cursor: pointer;
-      background: #2563eb;
-      color: #fff;
+      flex:1 1 140px;
+      padding:0.5rem;
+      border:none;
+      border-radius:999px;
+      font-size:0.85rem;
+      cursor:pointer;
     }
 
-    button.secondary {
-      background: #6b7280;
+    .btn-main {
+      background:#007bff;
+      color:#fff;
     }
 
-    canvas {
-      border: 1px solid #d1d5db;
-      border-radius: 0.5rem;
-      width: 100%;
-      max-width: 400px;
-      height: 150px;
-      touch-action: none;
-      background: #f9fafb;
+    .btn-secondary {
+      background:#e0e0e0;
     }
 
-    @media (max-width: 600px) {
-      table {
-        font-size: 0.8rem;
-      }
-      th, td {
-        padding: 0.25rem;
-      }
+    .footer {
+      margin-top:0.6rem;
+      font-size:0.7rem;
+      display:flex;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:0.5rem;
+    }
+
+    .footer .field {
+      min-width: 120px;
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>Wochenbericht</h1>
+<div class="wrapper">
+  <h1>Wochenbericht / Stundenzettel</h1>
 
-    <div class="row">
-      <label for="name">Name:</label>
-      <input id="name" type="text" value="Thomas Karius">
+  <div class="row">
+    <div class="field">
+      <label>Fahrer / Mitarbeiter</label>
+      <input id="name" type="text" placeholder="Name" />
     </div>
-
-    <div class="row">
-      <label for="fromDate">vom:</label>
-      <input id="fromDate" type="date">
-      <label for="toDate">bis:</label>
-      <input id="toDate" type="date">
-      <label>KW:</label>
-      <span id="kwDisplay">–</span>
+    <div class="field">
+      <label>vom</label>
+      <input id="from" type="date" />
     </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Tag</th>
-          <th>Start</th>
-          <th>Pause</th>
-          <th>Ende</th>
-          <th>Stunden</th>
-          <th>Tour</th>
-          <th>Spesen</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr data-day="montag">
-          <td>Montag</td>
-          <td><input type="time" id="start-montag"></td>
-          <td><input type="time" id="pause-montag"></td>
-          <td><input type="time" id="end-montag"></td>
-          <td><input type="text" id="hours-montag" class="hours" readonly></td>
-          <td><input type="text" id="tour-montag"></td>
-          <td><input type="number" id="spesen-montag" step="0.01" min="0"></td>
-        </tr>
-
-        <tr data-day="dienstag">
-          <td>Dienstag</td>
-          <td><input type="time" id="start-dienstag"></td>
-          <td><input type="time" id="pause-dienstag"></td>
-          <td><input type="time" id="end-dienstag"></td>
-          <td><input type="text" id="hours-dienstag" class="hours" readonly></td>
-          <td><input type="text" id="tour-dienstag"></td>
-          <td><input type="number" id="spesen-dienstag" step="0.01" min="0"></td>
-        </tr>
-
-        <tr data-day="mittwoch">
-          <td>Mittwoch</td>
-          <td><input type="time" id="start-mittwoch"></td>
-          <td><input type="time" id="pause-mittwoch"></td>
-          <td><input type="time" id="end-mittwoch"></td>
-          <td><input type="text" id="hours-mittwoch" class="hours" readonly></td>
-          <td><input type="text" id="tour-mittwoch"></td>
-          <td><input type="number" id="spesen-mittwoch" step="0.01" min="0"></td>
-        </tr>
-
-        <tr data-day="donnerstag">
-          <td>Donnerstag</td>
-          <td><input type="time" id="start-donnerstag"></td>
-          <td><input type="time" id="pause-donnerstag"></td>
-          <td><input type="time" id="end-donnerstag"></td>
-          <td><input type="text" id="hours-donnerstag" class="hours" readonly></td>
-          <td><input type="text" id="tour-donnerstag"></td>
-          <td><input type="number" id="spesen-donnerstag" step="0.01" min="0"></td>
-        </tr>
-
-        <tr data-day="freitag">
-          <td>Freitag</td>
-          <td><input type="time" id="start-freitag"></td>
-          <td><input type="time" id="pause-freitag"></td>
-          <td><input type="time" id="end-freitag"></td>
-          <td><input type="text" id="hours-freitag" class="hours" readonly></td>
-          <td><input type="text" id="tour-freitag"></td>
-          <td><input type="number" id="spesen-freitag" step="0.01" min="0"></td>
-        </tr>
-
-        <tr data-day="samstag">
-          <td>Samstag</td>
-          <td><input type="time" id="start-samstag"></td>
-          <td><input type="time" id="pause-samstag"></td>
-          <td><input type="time" id="end-samstag"></td>
-          <td><input type="text" id="hours-samstag" class="hours" readonly></td>
-          <td><input type="text" id="tour-samstag"></td>
-          <td><input type="number" id="spesen-samstag" step="0.01" min="0"></td>
-        </tr>
-      </tbody>
-
-      <tfoot>
-        <tr>
-          <td colspan="4">Summe Stunden:</td>
-          <td><span id="sumHours">0,00</span></td>
-          <td>Summe Spesen:</td>
-          <td><span id="sumSpesen">0,00</span> €</td>
-        </tr>
-      </tfoot>
-    </table>
-
-    <div class="buttons">
-      <button id="btnClear">Zurücksetzen</button>
-      <button id="btnWhatsApp">Per WhatsApp teilen</button>
-      <button id="btnPDF" class="secondary">Als PDF speichern</button>
-      <button id="btnPDFWA" class="secondary">PDF per WhatsApp senden</button>
+    <div class="field">
+      <label>bis</label>
+      <input id="to" type="date" />
     </div>
-
-    <div class="signature-wrapper" style="margin-top:1.5rem;">
-      <h2 style="font-size:1rem;">Unterschrift</h2>
-      <p style="font-size:0.8rem;color:#555;">Hier mit Finger oder Maus unterschreiben.</p>
-      <canvas id="signaturePad"></canvas>
-      <div class="buttons" style="margin-top:0.5rem;">
-        <button class="secondary" id="btnClearSig">Unterschrift löschen</button>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
-      <div style="flex:1 1 200px;">
-        <div style="border-bottom:1px solid #999;height:1.2rem;margin-bottom:0.25rem;"></div>
-        <div style="font-size:0.8rem;color:#666;">Datum</div>
-      </div>
-      <div style="flex:1 1 200px;">
-        <div style="border-bottom:1px solid #999;height:1.2rem;margin-bottom:0.25rem;"></div>
-        <div style="font-size:0.8rem;color:#666;">Unterschrift</div>
-      </div>
+    <div class="field">
+      <label>KW</label>
+      <input id="kw" type="number" min="1" max="53" />
     </div>
   </div>
 
-  <!-- PDF-Bibliotheken zuerst laden -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+      <tr>
+        <th>Tag</th>
+        <th>Start</th>
+        <th>Pause (Min)</th>
+        <th>Ende</th>
+        <th>Std. abzgl. Pause</th>
+        <th>Tour (1, 2, ...)</th>
+        <th>Spesen (€)</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- Montag -->
+      <tr id="row-mon" data-minutes="0">
+        <td>Montag</td>
+        <td><input id="start-mon" type="time" /></td>
+        <td><input id="pause-mon" type="number" min="0" inputmode="numeric" /></td>
+        <td><input id="end-mon" type="time" /></td>
+        <td id="hours-mon"></td>
+        <td><input id="tour-mon" type="text" /></td>
+        <td><input id="spesen-mon" type="text" inputmode="decimal" /></td>
+      </tr>
+      <!-- Dienstag -->
+      <tr id="row-die" data-minutes="0">
+        <td>Dienstag</td>
+        <td><input id="start-die" type="time" /></td>
+        <td><input id="pause-die" type="number" min="0" inputmode="numeric" /></td>
+        <td><input id="end-die" type="time" /></td>
+        <td id="hours-die"></td>
+        <td><input id="tour-die" type="text" /></td>
+        <td><input id="spesen-die" type="text" inputmode="decimal" /></td>
+      </tr>
+      <!-- Mittwoch -->
+      <tr id="row-mit" data-minutes="0">
+        <td>Mittwoch</td>
+        <td><input id="start-mit" type="time" /></td>
+        <td><input id="pause-mit" type="number" min="0" inputmode="numeric" /></td>
+        <td><input id="end-mit" type="time" /></td>
+        <td id="hours-mit"></td>
+        <td><input id="tour-mit" type="text" /></td>
+        <td><input id="spesen-mit" type="text" inputmode="decimal" /></td>
+      </tr>
+      <!-- Donnerstag -->
+      <tr id="row-don" data-minutes="0">
+        <td>Donnerstag</td>
+        <td><input id="start-don" type="time" /></td>
+        <td><input id="pause-don" type="number" min="0" inputmode="numeric" /></td>
+        <td><input id="end-don" type="time" /></td>
+        <td id="hours-don"></td>
+        <td><input id="tour-don" type="text" /></td>
+        <td><input id="spesen-don" type="text" inputmode="decimal" /></td>
+      </tr>
+      <!-- Freitag -->
+      <tr id="row-fre" data-minutes="0">
+        <td>Freitag</td>
+        <td><input id="start-fre" type="time" /></td>
+        <td><input id="pause-fre" type="number" min="0" inputmode="numeric" /></td>
+        <td><input id="end-fre" type="time" /></td>
+        <td id="hours-fre"></td>
+        <td><input id="tour-fre" type="text" /></td>
+        <td><input id="spesen-fre" type="text" inputmode="decimal" /></td>
+      </tr>
+      <!-- Samstag -->
+      <tr id="row-sam" data-minutes="0">
+        <td>Samstag</td>
+        <td><input id="start-sam" type="time" /></td>
+        <td><input id="pause-sam" type="number" min="0" inputmode="numeric" /></td>
+        <td><input id="end-sam" type="time" /></td>
+        <td id="hours-sam"></td>
+        <td><input id="tour-sam" type="text" /></td>
+        <td><input id="spesen-sam" type="text" inputmode="decimal" /></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <script>
-    const days = ["montag","dienstag","mittwoch","donnerstag","freitag","samstag"];
+  <div class="totals">
+    <div>
+      <strong>Gesamtstunden (Woche):</strong><br />
+      <span id="total-hours">00:00</span>
+    </div>
+    <div>
+      <strong>Spesen gesamt:</strong><br />
+      <span id="total-spesen">0,00 €</span>
+    </div>
+  </div>
 
-    function timeToMinutes(timeStr) {
-      if (!timeStr) return null;
-      const parts = timeStr.split(":");
-      if (parts.length !== 2) return null;
-      const h = Number(parts[0]);
-      const m = Number(parts[1]);
-      if (Number.isNaN(h) || Number.isNaN(m)) return null;
-      return h * 60 + m;
+  <div class="signature-container">
+    <label for="signature-pad" style="font-size:0.8rem;">Unterschrift:</label>
+    <canvas id="signature-pad"></canvas>
+  </div>
+
+  <div class="buttons">
+    <button class="btn-secondary" id="clear-signature">Unterschrift löschen</button>
+    <button class="btn-main" id="share-whatsapp">Per WhatsApp teilen</button>
+  </div>
+
+  <div class="footer">
+    <div class="field">
+      <label>Datum</label>
+      <input id="sign-date" type="date" />
+    </div>
+    <div class="field">
+      <label>Ort</label>
+      <input id="sign-place" type="text" />
+    </div>
+  </div>
+</div>
+
+<script>
+  const days = [
+    { id: "mon", label: "Montag" },
+    { id: "die", label: "Dienstag" },
+    { id: "mit", label: "Mittwoch" },
+    { id: "don", label: "Donnerstag" },
+    { id: "fre", label: "Freitag" },
+    { id: "sam", label: "Samstag" }
+  ];
+
+  function parseTimeToMinutes(timeStr) {
+    if (!timeStr) return null;
+    const [h, m] = timeStr.split(":").map(Number);
+    if (isNaN(h) || isNaN(m)) return null;
+    return h * 60 + m;
+  }
+
+  function minutesToHHMM(min) {
+    const hours = Math.floor(min / 60);
+    const minutes = min % 60;
+    return String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0");
+  }
+
+  function updateDay(dayId) {
+    const start = parseTimeToMinutes(document.getElementById("start-" + dayId).value);
+    const end = parseTimeToMinutes(document.getElementById("end-" + dayId).value);
+    const pauseInput = document.getElementById("pause-" + dayId).value;
+    const pause = parseInt(pauseInput || "0", 10);
+
+    const hoursCell = document.getElementById("hours-" + dayId);
+    const row = document.getElementById("row-" + dayId);
+
+    if (start !== null && end !== null && !isNaN(pause)) {
+      let diff = end - start - pause;
+      if (diff < 0) diff = 0;
+      hoursCell.textContent = minutesToHHMM(diff);
+      row.dataset.minutes = diff;
+    } else {
+      hoursCell.textContent = "";
+      row.dataset.minutes = 0;
     }
+    updateTotals();
+  }
 
-    function minutesToHoursString(mins) {
-      if (mins === null) return "";
-      const hours = mins / 60;
-      return hours.toFixed(2).replace(".", ",");
-    }
+  function updateTotals() {
+    // Stunden
+    let totalMinutes = 0;
+    days.forEach(d => {
+      const row = document.getElementById("row-" + d.id);
+      totalMinutes += parseInt(row.dataset.minutes || "0", 10);
+    });
+    document.getElementById("total-hours").textContent = minutesToHHMM(totalMinutes);
 
-    function calcDay(day) {
-      const start = timeToMinutes(document.getElementById("start-" + day).value);
-      const pause = timeToMinutes(document.getElementById("pause-" + day).value) || 0;
-      const end = timeToMinutes(document.getElementById("end-" + day).value);
-
-      let total = null;
-      if (start !== null && end !== null && end > start) {
-        total = end - start - pause;
-        if (total < 0) total = 0;
-      }
-      document.getElementById("hours-" + day).value = minutesToHoursString(total);
-      calcSum();
-    }
-
-    function calcSum() {
-      let totalHours = 0;
-      let totalSpesen = 0;
-
-      days.forEach(day => {
-        const hStr = document.getElementById("hours-" + day).value.replace(",", ".");
-        const h = parseFloat(hStr);
-        if (!isNaN(h)) totalHours += h;
-
-        const sStr = document.getElementById("spesen-" + day).value.replace(",", ".");
-        const s = parseFloat(sStr);
-        if (!isNaN(s)) totalSpesen += s;
-      });
-
-      document.getElementById("sumHours").textContent = totalHours.toFixed(2).replace(".", ",");
-      document.getElementById("sumSpesen").textContent = totalSpesen.toFixed(2).replace(".", ",");
-    }
-
-    function isoWeek(date) {
-      const tmp = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-      const dayNum = (tmp.getUTCDay() + 6) % 7;
-      tmp.setUTCDate(tmp.getUTCDate() - dayNum + 3);
-      const firstThursday = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 4));
-      const diff = (tmp - firstThursday) / 86400000;
-      return 1 + Math.round(diff / 7);
-    }
-
-    function updateWeekInfo() {
-      const fromInput = document.getElementById("fromDate");
-      const toInput = document.getElementById("toDate");
-
-      if (!fromInput.value) {
-        document.getElementById("kwDisplay").textContent = "–";
-        return;
-      }
-
-      const fromDate = new Date(fromInput.value);
-      if (!toInput.value) {
-        const t = new Date(fromDate);
-        t.setDate(t.getDate() + 5);
-        toInput.valueAsDate = t;
-      }
-
-      document.getElementById("kwDisplay").textContent = isoWeek(fromDate);
-    }
-
-    function clearAll() {
-      days.forEach(day => {
-        ["start","pause","end","hours","tour","spesen"].forEach(prefix => {
-          const el = document.getElementById(prefix + "-" + day);
-          if (el) el.value = "";
-        });
-      });
-      document.getElementById("sumHours").textContent = "0,00";
-      document.getElementById("sumSpesen").textContent = "0,00";
-    }
-
-    function buildWhatsAppText() {
-      const name = document.getElementById("name").value || "";
-      const from = document.getElementById("fromDate").value || "";
-      const to = document.getElementById("toDate").value || "";
-      const kw = document.getElementById("kwDisplay").textContent || "";
-      const sumHours = document.getElementById("sumHours").textContent;
-      const sumSpesen = document.getElementById("sumSpesen").textContent;
-
-      const lines = [];
-      lines.push("Wochenbericht");
-      if (name) lines.push("Name: " + name);
-      lines.push("Zeitraum: " + from + " bis " + to);
-      lines.push("Kalenderwoche: " + kw);
-      lines.push("");
-
-      days.forEach(day => {
-        const label = day.charAt(0).toUpperCase() + day.slice(1);
-        const start = document.getElementById("start-" + day).value || "-";
-        const pause = document.getElementById("pause-" + day).value || "-";
-        const end = document.getElementById("end-" + day).value || "-";
-        const h = document.getElementById("hours-" + day).value || "0";
-        const tour = document.getElementById("tour-" + day).value || "-";
-        const spesen = document.getElementById("spesen-" + day).value || "0";
-
-        lines.push(
-          `${label}: Start ${start}, Pause ${pause}, Ende ${end}, Stunden ${h}, Tour ${tour}, Spesen ${spesen} €`
-        );
-      });
-
-      lines.push("");
-      lines.push("Summe Stunden: " + sumHours);
-      lines.push("Summe Spesen: " + sumSpesen + " €");
-
-      return lines.join("\n");
-    }
-
-    function shareWhatsApp() {
-      const encoded = encodeURIComponent(buildWhatsAppText());
-      window.open("https://wa.me/?text=" + encoded, "_blank");
-    }
-
-    function setupSignaturePad() {
-      const canvas = document.getElementById("signaturePad");
-      const ctx = canvas.getContext("2d");
-
-      function resizeCanvas() {
-        const rect = canvas.getBoundingClientRect();
-        const ratio = window.devicePixelRatio || 1;
-        canvas.width = rect.width * ratio;
-        canvas.height = rect.height * ratio;
-        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-        ctx.lineWidth = 2;
-        ctx.lineCap = "round";
-      }
-
-      resizeCanvas();
-      window.addEventListener("resize", resizeCanvas);
-
-      let drawing = false;
-      let lastX = 0;
-      let lastY = 0;
-
-      function startDraw(x, y) {
-        drawing = true;
-        lastX = x;
-        lastY = y;
-      }
-
-      function draw(x, y) {
-        if (!drawing) return;
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        lastX = x;
-        lastY = y;
-      }
-
-      function endDraw() {
-        drawing = false;
-      }
-
-      canvas.addEventListener("mousedown", e => {
-        const r = canvas.getBoundingClientRect();
-        startDraw(e.clientX - r.left, e.clientY - r.top);
-      });
-
-      canvas.addEventListener("mousemove", e => {
-        const r = canvas.getBoundingClientRect();
-        draw(e.clientX - r.left, e.clientY - r.top);
-      });
-
-      window.addEventListener("mouseup", endDraw);
-
-      canvas.addEventListener("touchstart", e => {
-        e.preventDefault();
-        const t = e.touches[0];
-        const r = canvas.getBoundingClientRect();
-        startDraw(t.clientX - r.left, t.clientY - r.top);
-      }, { passive:false });
-
-      canvas.addEventListener("touchmove", e => {
-        e.preventDefault();
-        const t = e.touches[0];
-        const r = canvas.getBoundingClientRect();
-        draw(t.clientX - r.left, t.clientY - r.top);
-      }, { passive:false });
-
-      canvas.addEventListener("touchend", e => {
-        e.preventDefault();
-        endDraw();
-      });
-
-      document.getElementById("btnClearSig").addEventListener("click", () => {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-      });
-    }
-
-    async function createPDF() {
-      const element = document.querySelector(".container");
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      const pageWidth = 210;
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-
-      return pdf;
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      days.forEach(day => {
-        ["start","pause","end"].forEach(prefix => {
-          document.getElementById(prefix + "-" + day)
-            .addEventListener("change", () => calcDay(day));
-        });
-
-        document.getElementById("spesen-" + day)
-          .addEventListener("change", calcSum);
-      });
-
-      document.getElementById("fromDate")
-        .addEventListener("change", updateWeekInfo);
-
-      document.getElementById("btnClear")
-        .addEventListener("click", clearAll);
-
-      document.getElementById("btnWhatsApp")
-        .addEventListener("click", shareWhatsApp);
-
-      document.getElementById("btnPDF")
-        .addEventListener("click", async () => {
-          const pdf = await createPDF();
-          pdf.save("Stundenzettel.pdf");
-        });
-
-      document.getElementById("btnPDFWA")
-        .addEventListener("click", async () => {
-          const pdf = await createPDF();
-          const pdfBlob = pdf.output("blob");
-          const pdfFile = new File([pdfBlob], "Stundenzettel.pdf", {
-            type: "application/pdf"
-          });
-
-          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-            navigator.share({
-              files: [pdfFile],
-              title: "Stundenzettel",
-              text: "Hier ist der Stundenzettel als PDF."
-            });
-          } else {
-            alert("PDF kann nicht direkt geteilt werden. Bitte zuerst PDF speichern und dann manuell senden.");
-          }
-        });
-
-      setupSignaturePad();
-
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
+    // Spesen
+    let totalSpesen = 0;
+    days.forEach(d => {
+      const val = document.getElementById("spesen-" + d.id).value.trim();
+      if (val) {
+        const num = parseFloat(val.replace(",", "."));
+        if (!isNaN(num)) totalSpesen += num;
       }
     });
-  </script>
+    document.getElementById("total-spesen").textContent =
+      totalSpesen.toFixed(2).replace(".", ",") + " €";
+  }
+
+  function buildWhatsappText() {
+    const name = document.getElementById("name").value || "";
+    const from = document.getElementById("from").value || "";
+    const to = document.getElementById("to").value || "";
+    const kw = document.getElementById("kw").value || "";
+    const signDate = document.getElementById("sign-date").value || "";
+    const signPlace = document.getElementById("sign-place").value || "";
+
+    let lines = [];
+    lines.push("Wochenbericht " + (name || "").trim());
+    if (from || to) lines.push("Zeitraum: " + from + " - " + to);
+    if (kw) lines.push("KW: " + kw);
+    lines.push("");
+
+    days.forEach(d => {
+      const s = document.getElementById("start-" + d.id).value || "-";
+      const e = document.getElementById("end-" + d.id).value || "-";
+      const p = document.getElementById("pause-" + d.id).value || "0";
+      const h = document.getElementById("hours-" + d.id).textContent || "00:00";
+      const t = document.getElementById("tour-" + d.id).value || "-";
+      const sp = document.getElementById("spesen-" + d.id).value || "0";
+      if (s !== "-" || e !== "-" || t !== "-" || sp !== "0") {
+        lines.push(
+          d.label +
+          ": Start " + s +
+          ", Ende " + e +
+          ", Pause " + p + " Min" +
+          ", Std " + h +
+          ", Tour " + t +
+          ", Spesen " + sp + " €"
+        );
+      }
+    });
+
+    lines.push("");
+    lines.push("Gesamtstunden: " + document.getElementById("total-hours").textContent);
+    lines.push("Spesen gesamt: " + document.getElementById("total-spesen").textContent);
+    if (signPlace || signDate) {
+      lines.push("");
+      lines.push("Ort/Datum: " + (signPlace || "") + " " + (signDate || ""));
+    }
+    lines.push("Unterschrift: __________");
+
+    return lines.join("\n");
+  }
+
+  function sendWhatsapp() {
+    const text = encodeURIComponent(buildWhatsappText());
+    const url = "https://wa.me/?text=" + text;
+    window.open(url, "_blank");
+  }
+
+  // Signature Pad
+  const canvas = document.getElementById("signature-pad");
+  const ctx = canvas.getContext("2d");
+  let drawing = false;
+
+  function resizeCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+  }
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
+
+  canvas.addEventListener("pointerdown", e => {
+    drawing = true;
+    ctx.beginPath();
+    const pos = getPos(e);
+    ctx.moveTo(pos.x, pos.y);
+  });
+
+  canvas.addEventListener("pointermove", e => {
+    if (!drawing) return;
+    const pos = getPos(e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  });
+
+  canvas.addEventListener("pointerup", () => { drawing = false; });
+  canvas.addEventListener("pointerleave", () => { drawing = false; });
+
+  document.getElementById("clear-signature").addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+
+  document.getElementById("share-whatsapp").addEventListener("click", sendWhatsapp);
+
+  // Event-Listener für alle Eingaben
+  days.forEach(d => {
+    ["start", "end", "pause"].forEach(prefix => {
+      document.getElementById(prefix + "-" + d.id)
+        .addEventListener("input", () => updateDay(d.id));
+    });
+    document.getElementById("spesen-" + d.id)
+      .addEventListener("input", updateTotals);
+  });
+
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+</script>
 </body>
 </html>
